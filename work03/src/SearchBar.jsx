@@ -1,12 +1,11 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 function SearchBar({ onSearch }) {
-  const [value, setValue] = useState('');
+  const [value, setValue] = useState("");
 
   const handleChange = (e) => {
     const newValue = e.target.value;
     setValue(newValue);
-    // バグ: 入力のたびに即座にonSearchが呼ばれる（デバウンスなし）
     onSearch(newValue);
   };
 

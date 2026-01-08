@@ -1,16 +1,16 @@
-import { useState } from 'react';
-import SearchBar from './SearchBar';
-import UserList from './UserList';
-import UserDetail from './UserDetail';
-import { useUsers } from './hooks/useUsers';
+import { useState } from "react";
+import SearchBar from "./SearchBar";
+import UserList from "./UserList";
+import UserDetail from "./UserDetail";
+import { useUsers } from "./hooks/useUsers";
 
 function App() {
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedUserId, setSelectedUserId] = useState(null);
-  const { users, loading, error, removeUser, updateUserInList } = useUsers(searchQuery);
+  const { users, loading, error, removeUser, updateUserInList } =
+    useUsers(searchQuery);
 
   const handleSearch = (query) => {
-    // バグ: デバウンスがないため、キー入力のたびにAPIが呼ばれる
     setSearchQuery(query);
   };
 
@@ -36,7 +36,7 @@ function App() {
     <div className="min-h-screen bg-gray-900 text-gray-100 p-6">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-6 text-center">👥 ユーザー管理</h1>
-        
+
         <SearchBar onSearch={handleSearch} />
 
         {error && (
@@ -45,7 +45,7 @@ function App() {
           </div>
         )}
 
-        <UserList 
+        <UserList
           users={users}
           loading={loading}
           onSelect={handleSelectUser}
@@ -53,7 +53,7 @@ function App() {
         />
 
         {selectedUserId && (
-          <UserDetail 
+          <UserDetail
             userId={selectedUserId}
             onClose={handleCloseDetail}
             onUpdated={handleUserUpdated}

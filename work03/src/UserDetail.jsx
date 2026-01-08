@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { fetchUser, updateUser, deleteUser } from './api';
+import { useState, useEffect } from "react";
+import { fetchUser, updateUser, deleteUser } from "./api";
 
 function UserDetail({ userId, onClose, onUpdated, onDeleted }) {
   const [user, setUser] = useState(null);
@@ -11,45 +11,39 @@ function UserDetail({ userId, onClose, onUpdated, onDeleted }) {
   useEffect(() => {
     setLoading(true);
     setError(null);
-    
+
     fetchUser(userId)
-      .then(data => {
+      .then((data) => {
         setUser(data);
         setFormData(data);
         setLoading(false);
       })
-      .catch(err => {
+      .catch((err) => {
         setError(err.message);
         setLoading(false);
       });
-    
-    // バグ: userIdが変わっても古いリクエストがキャンセルされない
   }, [userId]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
-    
-    // バグ: 保存中に別の操作ができてしまう
-    // バグ: エラー時のUIフィードバックが不十分
+
     try {
       const updated = await updateUser(userId, formData);
       onUpdated(updated);
     } catch (err) {
       setError(err.message);
     }
-    
+
     setSaving(false);
   };
 
   const handleDelete = async () => {
-    // バグ: 削除中の状態管理がない
-    // バグ: エラー時のロールバックがない
     try {
       await deleteUser(userId);
       onDeleted(userId);
@@ -61,9 +55,7 @@ function UserDetail({ userId, onClose, onUpdated, onDeleted }) {
   if (loading) {
     return (
       <div className="fixed inset-0 bg-black/50 flex items-center justify-center">
-        <div className="bg-gray-800 rounded-lg p-6">
-          読み込み中...
-        </div>
+        <div className="bg-gray-800 rounded-lg p-6">読み込み中...</div>
       </div>
     );
   }
@@ -73,10 +65,7 @@ function UserDetail({ userId, onClose, onUpdated, onDeleted }) {
       <div className="bg-gray-800 rounded-lg p-6 w-full max-w-md">
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">ユーザー編集</h2>
-          <button 
-            onClick={onClose}
-            className="text-gray-400 hover:text-white"
-          >
+          <button onClick={onClose} className="text-gray-400 hover:text-white">
             ✕
           </button>
         </div>
@@ -93,7 +82,7 @@ function UserDetail({ userId, onClose, onUpdated, onDeleted }) {
             <input
               type="text"
               name="name"
-              value={formData.name || ''}
+              value={formData.name || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white"
             />
@@ -104,7 +93,7 @@ function UserDetail({ userId, onClose, onUpdated, onDeleted }) {
             <input
               type="email"
               name="email"
-              value={formData.email || ''}
+              value={formData.email || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white"
             />
@@ -114,7 +103,7 @@ function UserDetail({ userId, onClose, onUpdated, onDeleted }) {
             <label className="block text-sm text-gray-400 mb-1">役割</label>
             <select
               name="role"
-              value={formData.role || ''}
+              value={formData.role || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white"
             >
@@ -125,10 +114,12 @@ function UserDetail({ userId, onClose, onUpdated, onDeleted }) {
           </div>
 
           <div>
-            <label className="block text-sm text-gray-400 mb-1">ステータス</label>
+            <label className="block text-sm text-gray-400 mb-1">
+              ステータス
+            </label>
             <select
               name="status"
-              value={formData.status || ''}
+              value={formData.status || ""}
               onChange={handleChange}
               className="w-full px-3 py-2 rounded bg-gray-700 border border-gray-600 text-white"
             >
@@ -143,7 +134,7 @@ function UserDetail({ userId, onClose, onUpdated, onDeleted }) {
               disabled={saving}
               className="flex-1 bg-blue-600 hover:bg-blue-700 disabled:bg-gray-600 py-2 rounded font-medium"
             >
-              {saving ? '保存中...' : '保存'}
+              {saving ? "保存中..." : "保存"}
             </button>
             <button
               type="button"
