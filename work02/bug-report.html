@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>work02 バグレポート</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #1a1a2e; color: #eee; padding: 20px; }
+    h1 { text-align: center; margin-bottom: 30px; color: #ff6b6b; }
+    .bug-card { background: #16213e; border-radius: 12px; padding: 20px; margin-bottom: 20px; border-left: 4px solid #ff6b6b; }
+    .bug-title { color: #ff6b6b; font-size: 1.3em; margin-bottom: 10px; }
+    .file-location { background: #0f3460; padding: 8px 12px; border-radius: 6px; font-family: monospace; margin: 10px 0; color: #94b8ff; }
+    .code-block { background: #0a0a1a; padding: 15px; border-radius: 8px; font-family: 'Courier New', monospace; margin: 10px 0; overflow-x: auto; }
+    .code-wrong { color: #ff6b6b; }
+    .code-correct { color: #6bff6b; }
+    .comparison { display: flex; gap: 20px; margin-top: 15px; }
+    .comparison-box { flex: 1; padding: 15px; border-radius: 8px; }
+    .wrong { background: rgba(255, 107, 107, 0.1); border: 1px solid #ff6b6b; }
+    .correct { background: rgba(107, 255, 107, 0.1); border: 1px solid #6bff6b; }
+    .label { font-weight: bold; margin-bottom: 8px; }
+    .price { font-size: 1.5em; font-weight: bold; }
+    .screenshot-note { background: #e94560; color: white; padding: 15px; border-radius: 8px; margin-bottom: 20px; text-align: center; }
+  </style>
+</head>
+<body>
+  <h1>🐛 work02 バグレポート</h1>
+
+  <div class="screenshot-note">
+    📸 このHTMLファイルはスクリーンショットの代替です（ブラウザが利用不可のため）
+  </div>
+
+  <div class="bug-card">
+    <div class="bug-title">バグ1: 価格計算エラー</div>
+    <div class="file-location">📁 Cart.jsx:18行目</div>
+    <div class="code-block">
+      <span class="code-wrong">// 誤ったコード</span><br>
+      &lt;span&gt;¥{item.price <span class="code-wrong">+</span> item.quantity}&lt;/span&gt;
+    </div>
+    <div class="code-block">
+      <span class="code-correct">// 正しいコード</span><br>
+      &lt;span&gt;¥{item.price <span class="code-correct">*</span> item.quantity}&lt;/span&gt;
+    </div>
+    <div class="comparison">
+      <div class="comparison-box wrong">
+        <div class="label">❌ 現在の表示 (Tシャツ ¥2000 x 2)</div>
+        <div class="price">¥2,002</div>
+        <small>(2000 + 2 = 2002)</small>
+      </div>
+      <div class="comparison-box correct">
+        <div class="label">✅ 正しい表示</div>
+        <div class="price">¥4,000</div>
+        <small>(2000 × 2 = 4000)</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="bug-card">
+    <div class="bug-title">バグ2: クーポン割引が適用されない</div>
+    <div class="file-location">📁 utils.js:10-16行目 calcTotal関数</div>
+    <div class="code-block">
+      <span class="code-wrong">// 誤ったコード</span><br>
+      function calcTotal(cart, discountPercent) {<br>
+      &nbsp;&nbsp;const subtotal = cart.reduce(...);<br>
+      &nbsp;&nbsp;<span class="code-wrong">return subtotal; // discountPercent が無視されている！</span><br>
+      }
+    </div>
+    <div class="code-block">
+      <span class="code-correct">// 正しいコード</span><br>
+      function calcTotal(cart, discountPercent) {<br>
+      &nbsp;&nbsp;const subtotal = cart.reduce(...);<br>
+      &nbsp;&nbsp;<span class="code-correct">return Math.floor(subtotal * (100 - discountPercent) / 100);</span><br>
+      }
+    </div>
+    <div class="comparison">
+      <div class="comparison-box wrong">
+        <div class="label">❌ クーポン「SAVE10」適用後の合計 (¥9000)</div>
+        <div class="price">¥9,000</div>
+        <small>(割引が適用されていない)</small>
+      </div>
+      <div class="comparison-box correct">
+        <div class="label">✅ 正しい合計（10%OFF）</div>
+        <div class="price">¥8,100</div>
+        <small>(9000 × 0.9 = 8100)</small>
+      </div>
+    </div>
+  </div>
+
+  <div class="bug-card">
+    <div class="bug-title">バグ3: 在庫0でもカートに追加できる</div>
+    <div class="file-location">📁 ProductList.jsx:11-16行目</div>
+    <div class="code-block">
+      <span class="code-wrong">// 問題のあるコード</span><br>
+      &lt;button<br>
+      &nbsp;&nbsp;onClick={() => onAdd(product)}<br>
+      &nbsp;&nbsp;className="..."<br>
+      &gt;<br>
+      &nbsp;&nbsp;追加<br>
+      &lt;/button&gt;<br>
+      <span class="code-wrong">// 在庫チェックがない！</span>
+    </div>
+    <div class="code-block">
+      <span class="code-correct">// 修正案</span><br>
+      &lt;button<br>
+      &nbsp;&nbsp;onClick={() => onAdd(product)}<br>
+      &nbsp;&nbsp;<span class="code-correct">disabled={product.stock === 0}</span><br>
+      &nbsp;&nbsp;className="..."<br>
+      &gt;<br>
+      &nbsp;&nbsp;<span class="code-correct">{product.stock === 0 ? '売り切れ' : '追加'}</span><br>
+      &lt;/button&gt;
+    </div>
+    <div class="comparison">
+      <div class="comparison-box wrong">
+        <div class="label">❌ 現在の動作</div>
+        <div>キャップ (在庫: 0) の「追加」ボタンがクリック可能</div>
+      </div>
+      <div class="comparison-box correct">
+        <div class="label">✅ 期待される動作</div>
+        <div>在庫0の場合はボタン無効 or 「売り切れ」表示</div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
